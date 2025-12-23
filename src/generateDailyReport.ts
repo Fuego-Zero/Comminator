@@ -2,12 +2,11 @@ import { log, spinner } from "@clack/prompts";
 import { CONFIG } from "./config.ts";
 
 export async function generateDailyReport(logs: string) {
+  const s = spinner();
+  s.start(`🤖 正在连接 AI 生成日报...`);
+
   try {
-    const s = spinner();
-    s.start(`🤖 正在连接 AI 生成日报...`);
-
     const startTime = Date.now();
-
     const prompt = CONFIG.prompt + logs;
 
     const payload = {
@@ -16,11 +15,14 @@ export async function generateDailyReport(logs: string) {
       stream: false,
     };
 
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (CONFIG.apiKey) headers.Authorization = `Bearer ${CONFIG.apiKey}`;
+
     const response = await fetch(CONFIG.url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(payload),
     });
 
@@ -36,7 +38,7 @@ export async function generateDailyReport(logs: string) {
     log.message(data.response);
     log.success("报告生成完毕！");
   } catch (error) {
-    log.error("❌ AI 生成失败。请检查：");
+    s.stop(`❌ AI 生成失败。请检查：`);
     log.error(`错误详情: ${error}`);
   }
 }
