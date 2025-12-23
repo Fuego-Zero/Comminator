@@ -34,4 +34,5 @@ export const CONFIG = {
   author: process.env.author,
   url: process.env.AI_API_URL,
   model: process.env.AI_MODEL,
+  apiKey: process.env.AI_API_KEY,
 };
